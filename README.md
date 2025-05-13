@@ -15,6 +15,7 @@ Step 1. Clone the repo.
 ```shell
 git clone https://github.com/NESA-Lab/FirmRCA
 cd ./FirmRCA
+mkdir envs
 ```
 
 Step 2. Install the dependencies.
@@ -31,8 +32,8 @@ Then you should compile and install capstone as system library, following the in
 For example, on *nix:
 
 ```shell
-sudo ./make.sh
-sudo ./make.sh install
+PREFIX=$PWD/../envs ./make.sh
+PREFIX=$PWD/../envs ./make.sh install
 ```
 
 Some python packages:
@@ -49,9 +50,9 @@ Step 3. Compile the capnproto library.
 curl -O https://capnproto.org/capnproto-c++-1.0.1.tar.gz
 tar zxf capnproto-c++-1.0.1.tar.gz
 cd ./capnproto-c++-1.0.1
-./configure
-make -j4 check
-sudo make install
+./configure --prefix=$PWD/../envs
+make -j30 check
+make install
 ```
 
 ```shell
@@ -65,9 +66,10 @@ cmake --build --preset=ci-tests
 Compile the library.
 
 ```shell
+# can skip 
 cd ./test_c_capnproto
 # before capnp compile, you can modify bintrace.capnp if need
-capnp compile -o ./c-capnproto/build/capnpc-c bintrace.capnp 
+capnp compile -o ../c-capnproto/build/capnpc-c bintrace.capnp 
 gcc *.c -I./ -shared -fPIC -o libcapnproto.so
 cp ./libcapnproto.so ../src/lib
 ```
@@ -81,6 +83,8 @@ cd ./src
 ./autogen.sh
 ./configure
 cd src
+export LIBRARY_PATH=$PWD/../../envs/lib
+export C_INCLUDE_PATH=$PWD/../../envs/include/
 make
 ```
 
